@@ -1,4 +1,10 @@
-import { useState, createContext, ReactNode } from 'react'
+import { useState, createContext, ReactNode, useEffect } from 'react'
+
+import { JWT_SECRET } from '@env'
+
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+import api from '../api'
 
 interface UserProps {
   id: string
@@ -7,10 +13,20 @@ interface UserProps {
   token: string
 }
 
+interface SignInPros {
+  email: string
+  password: string
+} 
+
 interface AuthContextData {
   user: UserProps
   isAuthenticated: boolean
+  loadingAuth: boolean
+  loading: boolean
+  signIn: (credentials: SignInPros) => Promise<void>
+  signOut: () => Promise<void>
 }
+
 
 export const AuthContext = createContext({} as AuthContextData);
 
@@ -26,10 +42,87 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     token: ''
   })
 
-  const isAuthenticated = !!user
+  const [loadingAuth, setLoadingAuth] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true)
+
+  const isAuthenticated = !!user.name
+
+  useEffect(() => {
+    async function getUser() {
+      const userInfo = await AsyncStorage.getItem(JWT_SECRET)
+
+      const hasUser: UserProps = JSON.parse(userInfo || '{}')
+
+      if (Object.keys(hasUser).length > 0) {
+        api.defaults.headers.common.Authorization = `Bearer ${hasUser.token}`
+
+        setUser({
+          id: hasUser.id,
+          name: hasUser.name,
+          email: hasUser.email,
+          token: hasUser.token
+        })
+      }
+
+      setLoading(false)
+
+    }
+
+    getUser()
+  }, [])
+
+  async function signIn({email, password}: SignInPros) {
+    setLoadingAuth(true)    
+
+    try {
+      const response = await api.post('/login', {email, password})
+
+      const { id, name, token} = response.data
+
+      const data = {
+        ...response.data
+      }
+
+      await AsyncStorage.setItem(JWT_SECRET, JSON.stringify(data))
+
+      api.defaults.headers.common.Authorization = `Bearer ${token}`
+
+      setUser({
+        id,
+        name,
+        email,
+        token
+      })     
+      
+      setLoading(false)
+    } catch (error) {
+      console.log('Error', error);
+      setLoading(false)
+    }
+  }
+
+  async function signOut() {
+    await AsyncStorage.clear().then(() => {
+      setUser({
+        id: '',
+        name: '',
+        email: '',
+        token: ''
+      })
+    })
+  }
 
   return (
-    <AuthContext.Provider value={{isAuthenticated, user}}>
+    <AuthContext.Provider 
+      value={{
+        isAuthenticated, 
+        user, 
+        signIn, 
+        loading, 
+        loadingAuth, 
+        signOut
+      }}
+    >
       {children}
     </AuthContext.Provider>
 

@@ -15,13 +15,19 @@ export default function SignIn() {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
-  const { user } = useContext(AuthContext)
+  const { signIn } = useContext(AuthContext)
 
-  function sendData() {
+  async function sendData() {
     if(email.trim() === '' || password.trim() === '') {
       return
     }
-    alert(`Email: ${email} / Password: ${password}`)
+    
+    const data = {
+      email,
+      password
+    }
+
+    await signIn(data)
   }
 
   return (

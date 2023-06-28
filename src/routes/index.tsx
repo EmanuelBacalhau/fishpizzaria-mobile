@@ -1,11 +1,14 @@
+import { useContext } from 'react'
+
 import { View, ActivityIndicator, StyleSheet } from 'react-native'
 
 import AuthRoutes from './AuthRoutes'
 import NoAuthRoutes from './NoAuthRoutes'
 
+import { AuthContext } from '../contexts/AuthContext'
+
 export default function Routes() {
-  const isAuthenticated = false
-  const loading = false
+  const { isAuthenticated, loading } = useContext(AuthContext)
 
   if(loading) {
     return (
@@ -15,7 +18,7 @@ export default function Routes() {
     )
   }
 
-  return isAuthenticated ? <AuthRoutes /> : <NoAuthRoutes/>
+  return !isAuthenticated ? <NoAuthRoutes/> : <AuthRoutes/> 
 }
 
 const styles = StyleSheet.create({
