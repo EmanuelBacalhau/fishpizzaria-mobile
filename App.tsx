@@ -7,7 +7,7 @@ import Routes from './src/routes';
 export default function App() {
   return (
     <NavigationContainer>
-      <StatusBar backgroundColor='black' style='light' translucent={false}/>
+      <StatusBar backgroundColor='black' style='dark' translucent={false}/>
       <Routes />
     </NavigationContainer>
   );
