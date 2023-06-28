@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext} from "react";
 
 import { 
   Image, 
@@ -9,9 +9,13 @@ import {
   Text 
 } from "react-native";
 
+import { AuthContext } from "../../contexts/AuthContext";
+
 export default function SignIn() {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+
+  const { user } = useContext(AuthContext)
 
   function sendData() {
     if(email.trim() === '' || password.trim() === '') {
