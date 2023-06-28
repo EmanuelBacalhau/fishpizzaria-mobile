@@ -6,7 +6,9 @@ import {
   TextInput, 
   View, 
   TouchableOpacity, 
-  Text 
+  Text,
+  ActivityIndicator,
+  ToastAndroid
 } from "react-native";
 
 import { AuthContext } from "../../contexts/AuthContext";
@@ -15,10 +17,11 @@ export default function SignIn() {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
-  const { signIn } = useContext(AuthContext)
+  const { signIn, loadingAuth } = useContext(AuthContext)
 
   async function sendData() {
     if(email.trim() === '' || password.trim() === '') {
+      ToastAndroid.show("Email/Password is required", ToastAndroid.SHORT)
       return
     }
     
@@ -48,10 +51,21 @@ export default function SignIn() {
           style={styles.input} 
           secureTextEntry={true}
         />
-        <TouchableOpacity style={styles.button} onPress={sendData}>
-          <Text style={styles.buttonText}>
-            Access
-          </Text>
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={sendData} 
+          disabled={loadingAuth ? true : false}
+        >
+          {
+            loadingAuth ? (
+              <ActivityIndicator size={16} color="white" />
+            )
+            : (
+              <Text style={styles.buttonText}>
+                Access
+              </Text>
+            )
+          }
         </TouchableOpacity>
       </View>
     </View>
@@ -92,5 +106,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     color: 'black'
-  }
+  },
 })

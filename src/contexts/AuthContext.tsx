@@ -1,5 +1,7 @@
 import { useState, createContext, ReactNode, useEffect } from 'react'
 
+import { ToastAndroid } from 'react-native'
+
 import { JWT_SECRET } from '@env'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -94,10 +96,10 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         token
       })     
       
-      setLoading(false)
+      setLoadingAuth(false)
     } catch (error) {
-      console.log('Error', error);
-      setLoading(false)
+      ToastAndroid.show('Email or password invalid', ToastAndroid.SHORT)
+      setLoadingAuth(false)
     }
   }
 
