@@ -6,7 +6,7 @@ import Order from '../pages/Order'
 export type StackParamsList = {
   Dashboard: undefined
   Order: {
-    tableNumber: number | string,
+    table: number | string,
     orderId: string
   }
 }
