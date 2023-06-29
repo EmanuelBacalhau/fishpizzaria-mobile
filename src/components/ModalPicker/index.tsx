@@ -6,19 +6,19 @@ import {
   StyleSheet,
   ScrollView
 } from 'react-native'
-import { CategoryProps } from '../../pages/Order'
+import { CategoryProps, ProductProps } from '../../pages/Order'
 
 interface ModalPickerProps {
-  options: CategoryProps[]
+  options: CategoryProps[] | ProductProps[]
   close: () => void
-  itemSelected: (item: CategoryProps) => void
+  itemSelected: (item: CategoryProps | ProductProps) => void
 }
 
 const { width: wd, height: ht } = Dimensions.get('window')
 
 export function ModalPicker({ close, options, itemSelected }: ModalPickerProps) {
 
-  function setCategorySelected(item: CategoryProps ) {
+  function setCategorySelected(item: CategoryProps | ProductProps ) {
     itemSelected(item) 
     close()   
   }

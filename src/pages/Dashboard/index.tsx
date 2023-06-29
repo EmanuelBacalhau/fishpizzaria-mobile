@@ -40,11 +40,13 @@ export default function Dashboard() {
 
     const response = await api.post('/order', { table: Number(tableNumber), name})
 
-
     navigation.navigate('Order', {
       table: response.data.table,
       orderId: response.data.id
     })
+
+    setName('')
+    setTableNumber('')
   }
 
   return (
