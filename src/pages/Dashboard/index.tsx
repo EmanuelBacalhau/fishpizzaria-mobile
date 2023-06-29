@@ -18,26 +18,32 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StackParamsList } from '../../routes/AuthRoutes'
 
+import api from '../../api';
+
 export default function Dashboard() {
   const navigation = useNavigation<NativeStackNavigationProp<StackParamsList>>()
 
   const { signOut } = useContext(AuthContext)
-
+  
+  const [name, setName] = useState<string>('') 
   const [tableNumber, setTableNumber] = useState<string>('')
 
   function handleSignOut() {
     signOut()
   }
 
-  function handleSendDate() {
+  async function handleSendDate() {
     if(tableNumber === '') {
       ToastAndroid.show('Number is required', ToastAndroid.SHORT)
       return
     }
 
+    const response = await api.post('/order', { table: Number(tableNumber), name})
+
+
     navigation.navigate('Order', {
-      tableNumber,
-      orderId: '123'
+      table: response.data.table,
+      orderId: response.data.id
     })
   }
 
@@ -51,6 +57,14 @@ export default function Dashboard() {
       <View style={styles.containerSection}>
         <View style={styles.containerInput}>
           <Text style={styles.inputText}>New order</Text>
+          <TextInput 
+            placeholder='Name' 
+            style={styles.input} 
+            keyboardType='default' 
+            secureTextEntry={false}
+            value={name}
+            onChangeText={(text) => setName(text)}
+          />
           <TextInput 
             placeholder='Table number' 
             style={styles.input} 
