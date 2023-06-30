@@ -9,6 +9,7 @@ export type StackParamsList = {
     table: number | string,
     orderId: string
   }
+
 }
 
 const Stack = createNativeStackNavigator<StackParamsList>()

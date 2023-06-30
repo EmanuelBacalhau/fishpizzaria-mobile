@@ -62,7 +62,7 @@ export default function SignIn() {
             )
             : (
               <Text style={styles.buttonText}>
-                Access
+                ACCESS
               </Text>
             )
           }

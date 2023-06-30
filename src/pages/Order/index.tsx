@@ -11,13 +11,15 @@ import {
 } from 'react-native'
 
 import { ModalPicker } from '../../components/ModalPicker'
+import { OrderItem } from '../../components/OrderItem'
 
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { StackParamsList } from '../../routes/AuthRoutes'
 
 import { Trash2, Plus } from 'lucide-react-native'
 
 import api from '../../api'
-import { OrderItem } from '../../components/OrderItem'
 
 type RouteDetailParams = {
   Order: {
@@ -50,7 +52,7 @@ export interface OrderItemProps {
 
 export default function Order() {
   const route = useRoute<OrderRouteProps>()
-  const navigation = useNavigation()
+  const navigation = useNavigation<NativeStackNavigationProp<StackParamsList>>()
 
   const [categories, setCategories] = useState<CategoryProps[] | []>([])
   const [products, setProducts] = useState<ProductProps[] | []>([])
@@ -132,7 +134,7 @@ export default function Order() {
     }
   }
 
-  const handleDeleteItem = async (itemId: string, index: number) => {
+  const handleDeleteItem = async (itemId: string) => {
     try {
       await api.delete('/orderItem/remove', {
         params: {
@@ -149,9 +151,20 @@ export default function Order() {
     }
   }
 
-  useEffect(() => {
-    setItens(itens)
-  }, [itens])
+  const handleFinishOrder = async () => {
+    try {
+      const orderId = route.params.orderId
+      await api.patch('/order/send', null, {
+        params: {
+          orderId
+        }
+      })
+      
+      navigation.goBack()
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   useEffect(() => {
     getCategories()    
@@ -163,7 +176,6 @@ export default function Order() {
     }
     getProductByCategory(categorySelected?.id)
   }, [categorySelected])
-
 
   return (
     <ScrollView style={styles.container}>
@@ -215,10 +227,11 @@ export default function Order() {
             <Plus size={24} color='white' strokeWidth={3} />
           </TouchableOpacity>
           <TouchableOpacity 
-            style={[styles.next, { opacity: itens.length === 0 ? 0.5 : 1 }]}
+            style={[styles.send, { opacity: itens.length === 0 ? 0.5 : 1 }]}
             disabled={itens.length === 0 ? true : false}
+            onPress={handleFinishOrder}
           >
-            <Text style={styles.nextText}>Next</Text>
+            <Text style={styles.nextText}>SEND REQUEST</Text>
           </TouchableOpacity>
         </View>
 
@@ -227,7 +240,7 @@ export default function Order() {
             <OrderItem 
               key={index} 
               item={item} 
-              deleteItem={() => handleDeleteItem(item.id, index)}
+              deleteItem={() => handleDeleteItem(item.id)}
             />
           ))
         }
@@ -326,13 +339,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  next: {
+  send: {
     backgroundColor: '#42FF00',
     width: '77%',
     height: 40,
     borderRadius: 4,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   nextText: {
     fontWeight: 'bold',

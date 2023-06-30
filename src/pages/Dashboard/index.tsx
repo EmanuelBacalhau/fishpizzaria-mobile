@@ -77,7 +77,7 @@ export default function Dashboard() {
           />
           <TouchableOpacity style={styles.button} onPress={handleSendDate}>
             <Text style={styles.buttonText}>
-              Open table
+              OPEN TABLE
             </Text>
           </TouchableOpacity>
         </View>
